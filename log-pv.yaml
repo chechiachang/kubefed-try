@@ -1,0 +1,15 @@
+apiVersion: extensions/v1beta1
+kind: PersistentVolume
+metadata:
+  name: log-storage-10g
+  labels:
+    type: local
+    target: log-storage
+spec:
+  storageClassName: slow-many
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/linker/data/log"
