@@ -60,7 +60,7 @@ kubefed::join(){
 
   done
 
-  echo "kubectl --context=${FED_NAME} get clsuters"
+  echo "kubectl --context=${FED_NAME} get clusters"
   kubectl --context=${FED_NAME} get clusters
 
 }
