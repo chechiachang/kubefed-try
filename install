@@ -1,0 +1,15 @@
+#!/bin/bash
+#
+# Install 
+
+# Kubefed
+wget https://storage.googleapis.com/aurora-installer-release/federation-client-linux-amd64.tar.gz
+tar zxf federation-client-linux-amd64.tar.gz
+sudo cp federation/client/bin/kubefed /usr/local/bin && \
+  chmod +x /usr/local/bin/kubefed
+
+# Kubectl
+curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+
+sudo chmod +x ./kubectl && \
+  mv ./kubectl /usr/local/bin/kubectl
