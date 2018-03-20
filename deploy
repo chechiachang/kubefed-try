@@ -7,7 +7,7 @@
 # gcloud container clusters list | awk 'FNR > 1 { print $1 }'
 
 FED_NAME="federation"
-FED_CLUSTER_NAME="kubefed1"
+declare -a CLUSTERS=("kubefed1" "kubefed2")
 FED_CLUSTER_CONTEXT=$(kubectl config get-contexts | grep '*' | awk '{print $2}')
 GCLOUD_DNS_NAME="kubefed"
 GCLOUD_DNS_ZONE_NAME="kubefed.io"
@@ -25,14 +25,18 @@ kubefed::init(){
   # ONCE
   gcloud config set container/use_client_certificate True
   export CLOUDSDK_CONTAINER_USE_CLIENT_CERTIFICATE=True
+ 
+  for c in ${CLUSTERS[@]}; do 
+    gcloud container clusters get-credentials $c
+    CLUSTER_CONTEXT=$(kubectl config get-contexts | grep '*' | awk '{print $2}')
+
+    # Set context
+    # MISSED in doc
+    kubectl config set-context ${FED_CLUSTER_NAME} \
+      --cluster=${CLUSTER_CONTEXT} \
+      --user=${CLUSTER_CONTEXT} 
+  done
   
-  gcloud container clusters get-credentials ${FED_CLUSTER_NAME}
-  
-  # Set context
-  # MISSED in doc
-  kubectl config set-context ${FED_CLUSTER_NAME} \
-    --cluster=${FED_CLUSTER_CONTEXT} \
-    --user=${FED_CLUSTER_CONTEXT} 
   
   kubefed init ${FED_NAME} \
     --host-cluster-context=${FED_CLUSTER_CONTEXT} \
@@ -40,33 +44,23 @@ kubefed::init(){
     --dns-zone-name="${GCLOUD_DNS_ZONE_NAME}."
   # There is / MUST BE a dot tailing dns zone name. 
 
+  kubectl config set-context ${FED_NAME}
+  kubectl create namespace default --context=${FED_NAME}
+
 }
 
 kubefed::join(){
 
-  kubefed join ${FED_CLUSTER_NAME} \
-    --host-cluster-context=${FED_CLUSTER_NAME} \
-    --context=${FED_NAME}
-
-}
-
-add_new_cluster(){
-
-  NEW_CLUSTER_NAME="kubefed2"
+  for c in ${CLUSTERS[@]}; do
   
-  gcloud container clusters get-credentials ${NEW_CLUSTER_NAME}
-  
-  # Set context
-  new_cluster_context=$(kubectl config get-contexts | grep '*' | awk '{print $2}')
-  kubectl config set-context ${NEW_CLUSTER_NAME} \
-    --cluster=${new_cluster_context} \
-    --user=${new_cluster_context} 
-  
-  kubefed join ${NEW_CLUSTER_NAME} \
-    --host-cluster-context=${FED_CLUSTER_CONTEXT}
+    kubefed join $c \
+      --context ${FED_NAME} \
+      --cluster-context=$c \
+      --host-cluster-context=${CLUSTERS[0]}
+    
+  done
 
 }
 
 kubefed::init #done
-
-
+kubefed::join

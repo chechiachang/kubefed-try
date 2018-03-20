@@ -3,9 +3,10 @@
 # Unisntall kube federation
 
 FED_NAME="federation"
-FED_CLUSTER_NAME="kubefed1"
-FED_CLSUTER_CONTEXT=$(kubectl config get-contexts | grep '*' | awk '{print $2}')
+declare -a CLUSTERS=("kubefed1" "kubefed2")
 GCLOUD_DNS_NAME="kubefed"
 GCLOUD_DNS_ZONE_NAME="kubefed.io"
 
-kubectl delete namespace federation-system --context=${FED_CLUSTER_CONTEXT}
+for c in ${CLUSTERS[@]}; do
+  kubectl delete namespace federation-system --context=$c
+done
