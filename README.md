@@ -5,6 +5,8 @@ kubefed-try
 
 [Nice guide](http://cgrant.io/tutorials/gcp/compute/gke/global-kubernetes-three-steps/)
 
+[Hard way guide](https://github.com/kelseyhightower/kubernetes-cluster-federation)
+
 https://kubernetes.io/docs/tasks/federation/set-up-cluster-federation-kubefed/
 
 https://kubernetes.io/docs/tasks/administer-federation/deployment/
