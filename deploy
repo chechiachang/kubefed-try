@@ -8,56 +8,65 @@
 
 FED_NAME="federation"
 FED_CLUSTER_NAME="kubefed1"
-FED_CLSUTER_CONTEXT=$(kubectl config get-contexts | grep '*' | awk '{print $2}')
+FED_CLUSTER_CONTEXT=$(kubectl config get-contexts | grep '*' | awk '{print $2}')
 GCLOUD_DNS_NAME="kubefed"
 GCLOUD_DNS_ZONE_NAME="kubefed.io"
 
+# ONCE
 init_dns(){
 
-gcloud dns managed-zones create ${GCLOUD_DNS_NAME} --description="kubefed.io" --dns-name="${GCLOUD_DNS_ZONE_NAME}"
+  gcloud dns managed-zones create ${GCLOUD_DNS_NAME} --description="kubefed.io" --dns-name="${GCLOUD_DNS_ZONE_NAME}"
 
 }
 
 kubefed::init(){
 
-# Magic step
-gcloud config set container/use_client_certificate True
-export CLOUDSDK_CONTAINER_USE_CLIENT_CERTIFICATE=True
-
-gcloud container clusters get-credentials ${FED_CLUSTER_NAME}
-
-# Set context
-kubectl config set-context ${FED_CLUSTER_NAME} \
-  --cluster=${FED_CLSUTER_CONTEXT} \
-  --user=${FED_CLUSTER_CONTEXT} 
-
-kubefed init ${FED_NAME} \
-  --host-cluster-context=${FED_CLUSTER_CONTEXT} \
-  --dns-provider="google-clouddns" \
-  --dns-zone-name="${GCLOUD_DNS_ZONE_NAME}."
-# There is / MUST BE a dot tailing dns zone name. 
+  # MISSED in doc
+  # ONCE
+  gcloud config set container/use_client_certificate True
+  export CLOUDSDK_CONTAINER_USE_CLIENT_CERTIFICATE=True
+  
+  gcloud container clusters get-credentials ${FED_CLUSTER_NAME}
+  
+  # Set context
+  # MISSED in doc
+  kubectl config set-context ${FED_CLUSTER_NAME} \
+    --cluster=${FED_CLUSTER_CONTEXT} \
+    --user=${FED_CLUSTER_CONTEXT} 
+  
+  kubefed init ${FED_NAME} \
+    --host-cluster-context=${FED_CLUSTER_CONTEXT} \
+    --dns-provider="google-clouddns" \
+    --dns-zone-name="${GCLOUD_DNS_ZONE_NAME}."
+  # There is / MUST BE a dot tailing dns zone name. 
 
 }
 
 kubefed::join(){
-echo ""
+
+  kubefed join ${FED_CLUSTER_NAME} \
+    --host-cluster-context=${FED_CLUSTER_NAME} \
+    --context=${FED_NAME}
+
 }
 
 add_new_cluster(){
 
-NEW_CLUSTER_NAME="kubefed2"
-
-gcloud container clusters get-credentials ${NEW_CLUSTER_NAME}
-
-# Set context
-new_cluster_context=$(kubectl config get-contexts | grep '*' | awk '{print $2}')
-kubectl config set-context ${NEW_CLUSTER_NAME} \
-  --cluster=${new_cluster_context} \
-  --user=${new_cluster_context} 
-
-kubefed join ${NEW_CLUSTER_NAME} \
-  --host-cluster-context=${FED_CLUSTER_CONTEXT}
+  NEW_CLUSTER_NAME="kubefed2"
+  
+  gcloud container clusters get-credentials ${NEW_CLUSTER_NAME}
+  
+  # Set context
+  new_cluster_context=$(kubectl config get-contexts | grep '*' | awk '{print $2}')
+  kubectl config set-context ${NEW_CLUSTER_NAME} \
+    --cluster=${new_cluster_context} \
+    --user=${new_cluster_context} 
+  
+  kubefed join ${NEW_CLUSTER_NAME} \
+    --host-cluster-context=${FED_CLUSTER_CONTEXT}
 
 }
 
-kubefed::init
+kubefed::init #done
+
+
