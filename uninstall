@@ -2,11 +2,11 @@
 #
 # Unisntall kube federation
 
+source lib/kubefed
+
 FED_NAME="federation"
 declare -a CLUSTERS=("kubefed1" "kubefed2")
 GCLOUD_DNS_NAME="kubefed"
 GCLOUD_DNS_ZONE_NAME="kubefed.io"
 
-for c in ${CLUSTERS[@]}; do
-  kubectl delete namespace federation-system --context=$c
-done
+kubefed::uninstall

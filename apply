@@ -1,0 +1,16 @@
+#!/bin/bash
+#
+#
+
+FED_NAME="federation"
+declare -a CLUSTERS=("kubefed1" "kubefed2")
+GCLOUD_DNS_NAME="kubefed"
+GCLOUD_DNS_ZONE_NAME="kubefed.io"
+
+kubernetes::apply_nginx(){
+
+  kubectl --context=${FED_NAME} create deployment nginx --image=nginx && \
+    kubectl --context=${FED_NAME} scale deployment nginx --replicas=2
+}
+
+kubernetes::apply_nginx

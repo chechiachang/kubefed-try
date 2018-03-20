@@ -3,6 +3,8 @@ kubefed-try
 
 # Guide
 
+[Nice guide](http://cgrant.io/tutorials/gcp/compute/gke/global-kubernetes-three-steps/)
+
 https://kubernetes.io/docs/tasks/federation/set-up-cluster-federation-kubefed/
 
 https://kubernetes.io/docs/tasks/administer-federation/deployment/
@@ -20,5 +22,11 @@ gcloud init
 
 ```
 sudo ./install
+```
+
+# Deploy kube federation
+
+```
+./deploy
 ```
 

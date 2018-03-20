@@ -4,62 +4,20 @@
 #
 # Prerequiesites: kubectl, kubefed, gcloud
 
-# gcloud container clusters list | awk 'FNR > 1 { print $1 }'
+source lib/kubefed
 
 FED_NAME="federation"
 declare -a CLUSTERS=("kubefed1" "kubefed2")
-FED_CLUSTER_CONTEXT=$(kubectl config get-contexts | grep '*' | awk '{print $2}')
 GCLOUD_DNS_NAME="kubefed"
 GCLOUD_DNS_ZONE_NAME="kubefed.io"
 
 # ONCE
-init_dns(){
+gcloud::init_dns(){
 
   gcloud dns managed-zones create ${GCLOUD_DNS_NAME} --description="kubefed.io" --dns-name="${GCLOUD_DNS_ZONE_NAME}"
 
 }
 
-kubefed::init(){
+kubefed::init
 
-  # MISSED in doc
-  # ONCE
-  gcloud config set container/use_client_certificate True
-  export CLOUDSDK_CONTAINER_USE_CLIENT_CERTIFICATE=True
- 
-  for c in ${CLUSTERS[@]}; do 
-    gcloud container clusters get-credentials $c
-    CLUSTER_CONTEXT=$(kubectl config get-contexts | grep '*' | awk '{print $2}')
-
-    # Set context
-    # MISSED in doc
-    kubectl config set-context $c \
-      --cluster=${CLUSTER_CONTEXT} \
-      --user=${CLUSTER_CONTEXT} 
-  done
-  
-  kubefed init ${FED_NAME} \
-    --context=${CLUSTERS[0]} \
-    --host-cluster-context=${CLUSTERS[0]} \
-    --dns-provider="google-clouddns" \
-    --dns-zone-name="${GCLOUD_DNS_ZONE_NAME}."
-  # There is / MUST BE a dot tailing dns zone name. 
-
-  kubectl create namespace default --context=${FED_NAME}
-
-}
-
-kubefed::join(){
-
-  for c in ${CLUSTERS[@]}; do
-  
-    kubefed join $c \
-      --context ${FED_NAME} \
-      --cluster-context=$c \
-      --host-cluster-context=${CLUSTERS[0]}
-    
-  done
-
-}
-
-kubefed::init #done
 kubefed::join
