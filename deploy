@@ -32,19 +32,18 @@ kubefed::init(){
 
     # Set context
     # MISSED in doc
-    kubectl config set-context ${FED_CLUSTER_NAME} \
+    kubectl config set-context $c \
       --cluster=${CLUSTER_CONTEXT} \
       --user=${CLUSTER_CONTEXT} 
   done
   
-  
   kubefed init ${FED_NAME} \
-    --host-cluster-context=${FED_CLUSTER_CONTEXT} \
+    --context=${CLUSTERS[0]} \
+    --host-cluster-context=${CLUSTERS[0]} \
     --dns-provider="google-clouddns" \
     --dns-zone-name="${GCLOUD_DNS_ZONE_NAME}."
   # There is / MUST BE a dot tailing dns zone name. 
 
-  kubectl config set-context ${FED_NAME}
   kubectl create namespace default --context=${FED_NAME}
 
 }
