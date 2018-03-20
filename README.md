@@ -32,3 +32,15 @@ sudo ./install
 ./deploy
 ```
 
+# Api test
+
+[v] cluster
+[ ] configMap
+[ ] daemonset
+[v] service
+[v] deployment
+[v] replicasets
+
+[x] pv
+[x] event
+

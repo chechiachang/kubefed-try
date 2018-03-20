@@ -65,7 +65,7 @@ kubefed::join(){
 
 }
 
-kubefed::install(){
+kubefed::uninstall(){
   for c in ${CLUSTERS[@]}; do
     kubectl delete namespace federation-system --context=$c
   done
