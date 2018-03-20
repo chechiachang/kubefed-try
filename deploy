@@ -1,0 +1,45 @@
+#!/bin/bash
+#
+# Deploy kube federation control panel
+#
+# Prerequiesites: kubectl, kubefed, gcloud
+
+# gcloud container clusters list | awk 'FNR > 1 { print $1 }'
+
+source config
+
+###
+# Create dns zone
+###
+
+gcloud dns managed-zones create ${GCLOUD_DNS_NAME} --description="kubefed.io" --dns-name="${GCLOUD_DNS_ZONE_NAME}"
+
+###
+# Kubefed init
+###
+
+# Magic step
+gcloud config set container/use_client_certificate True
+export CLOUDSDK_CONTAINER_USE_CLIENT_CERTIFICATE=True
+
+# Get credential
+gcloud container clusters get-credentials ${FED_CLUSTER_NAME}
+
+kubefed init ${FED_NAME} \
+  --host-cluster-context=${FED_CLUSTER_CONTEXT} \
+  --dns-provider="google-clouddns" \
+  --dns-zone-name="${GCLOUD_DNS_ZONE_NAME}."
+# There is / MUST BE a dot tailing dns zone name. 
+
+# Check
+kubectl get all -n federation-system
+kubectl config get-contexts
+
+# Switch context to federation
+kubectl config use-context ${FED_NAME}
+
+
+
+
+
+

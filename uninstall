@@ -1,0 +1,7 @@
+#!/bin/bash
+#
+# Unisntall kube federation
+
+source config
+
+kubectl delete namespace ${FED_NAME}

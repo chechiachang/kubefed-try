@@ -1,0 +1,11 @@
+#!/bin/bash
+#
+#
+
+FED_NAME="federation"
+FED_CLUSTER_NAME="kubefed1"
+# kubectl config get-contexts | grep '*' | awk '{print $2}'
+FED_CLUSTER_CONTEXT="gke_linker-aurora_asia-east1-a_kubefed1"
+
+GCLOUD_DNS_NAME="kubefed"
+GCLOUD_DNS_ZONE_NAME="kubefed.io"
