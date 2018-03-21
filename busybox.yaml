@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Pod
+metadata:
+  name: debugbox
+  namespace: default
+spec:
+  volumes:
+  - name: data-volume
+    persistentVolumeClaim:
+      claimName: data-storage
+  containers:
+  - image: busybox
+    command:
+      - tail
+      - -f
+      - /etc/hosts
+    imagePullPolicy: IfNotPresent
+    name: debugbox
+    volumeMounts:
+    - mountPath: /workspace
+      name: data-volume
+  restartPolicy: Always

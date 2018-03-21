@@ -18,6 +18,27 @@ gcloud::init_dns(){
 
 }
 
+# This might take a few minutes
+gcloud::init_clusters(){
+
+  for c in ${CLUSTERS[@]}; do
+  
+    gcloud container clusters create $c \
+      --zone "asia-east1-a" \
+      --cluster-version="1.9.4-gke.1" \
+      --disk-size="100" \
+      --num-nodes="1" \
+      --scopes "cloud-platform,storage-ro,logging-write,monitoring-write,service-control,service-management,https://www.googleapis.com/auth/ndev.clouddns.readwrite" \
+      &
+  
+  done
+
+  wait
+
+}
+
+#gcloud::init_clusters
+
 kubefed::init
 
 kubefed::join
