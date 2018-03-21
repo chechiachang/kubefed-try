@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: touch-hostpath-file
+spec:
+  backoffLimit: 5
+  activeDeadlineSeconds: 100
+  template:
+    spec:
+      containers:
+      - name: alpine
+        image: alpine
+        command: ["sh", "-c", "echo david >> /var/lib/data/david"]
+        volumeMounts:
+        - mountPath: /var/lib/data
+          name: hostpath-data
+        resources:
+          requests:
+            cpu: 10m
+      restartPolicy: Never
+      volumes:
+      - name: hostpath-data
+        persistentVolumeClaim:
+          claimName: pvc-hostpath-data
